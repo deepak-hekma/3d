@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import { ArrowRight, Activity, Brain, Heart, Wind, Zap, Compass, Bone } from 'lucide-react';
 import type { CategoryData } from '../../data/conditions-data';
 import { useAnatomyStore } from '../../stores/anatomy-store';
@@ -19,16 +18,15 @@ const ICON_MAP: Record<string, any> = {
 };
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
-  const navigate = useNavigate();
   const {
     hoveredCardRegion,
     setHoveredCardRegion,
-    setSelectedCategory,
-    selectedCategoryId,
+    openCascadingMenu,
+    activeCascadingCategory,
   } = useAnatomyStore();
 
   const isHovered = hoveredCardRegion === category.regionId;
-  const isSelected = selectedCategoryId === category.id;
+  const isSelected = activeCascadingCategory?.id === category.id;
 
   const IconComponent = ICON_MAP[category.iconName] || Activity;
 
@@ -37,12 +35,14 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   };
 
   const handleMouseLeave = () => {
-    setHoveredCardRegion(null);
+    // Keep focus if this card's menu is open, otherwise clear
+    if (!activeCascadingCategory) {
+      setHoveredCardRegion(null);
+    }
   };
 
   const handleClick = () => {
-    setSelectedCategory(category.id);
-    navigate({ to: '/conditions/$categoryId', params: { categoryId: category.id } });
+    openCascadingMenu(category);
   };
 
   return (

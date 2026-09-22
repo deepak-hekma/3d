@@ -7,6 +7,7 @@ import { CameraController } from './CameraController';
 import { AtlasSkeleton } from './AtlasSkeleton';
 import { RegionHighlight } from './RegionHighlight';
 import { useAtlas } from '../../lib/atlas/useAtlas';
+import { useAnatomyStore } from '../../stores/anatomy-store';
 
 interface BodySceneProps {
   onRegionClick?: (categoryId: string) => void;
@@ -15,6 +16,7 @@ interface BodySceneProps {
 export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
   const [retry, setRetry] = useState(0);
   const [contextLost, setContextLost] = useState(false);
+  const { activeLayerFilter, setActiveLayerFilter } = useAnatomyStore();
   const { status, progress, error, meshes } = useAtlas(retry);
   const failed = status === 'error' || contextLost;
   const mobile = typeof window !== 'undefined' && window.innerWidth < 768;
@@ -127,6 +129,33 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Floating Anatomical Layer Selector (All Systems | Organs Only | Skeleton | Muscular) */}
+      {status === 'ready' && !contextLost && (
+        <div className="absolute top-4 left-4 z-20 flex items-center gap-1 p-1 rounded-2xl bg-white/90 backdrop-blur-xl border border-slate-200/90 shadow-md pointer-events-auto">
+          {(
+            [
+              { id: 'all', label: 'All Systems' },
+              { id: 'organs', label: 'Organs Only' },
+              { id: 'skeleton', label: 'Skeleton' },
+              { id: 'muscular', label: 'Muscular' },
+            ] as const
+          ).map((layer) => (
+            <button
+              key={layer.id}
+              type="button"
+              onClick={() => setActiveLayerFilter(layer.id)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                activeLayerFilter === layer.id
+                  ? 'bg-[#0B132B] text-white shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+              }`}
+            >
+              {layer.label}
+            </button>
+          ))}
         </div>
       )}
 

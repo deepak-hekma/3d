@@ -11,6 +11,8 @@ interface AnatomyState {
   pointerPos: { x: number; y: number } | null;
   selectedCategoryId: string | null;
   activePopoverCategory: CategoryData | null;
+  activeCascadingCategory: CategoryData | null;
+  activeSubRegion: string | null;
   regionFilter: RegionFilter;
   activeLayerFilter: LayerFilter;
   cameraPosition: [number, number, number];
@@ -24,6 +26,9 @@ interface AnatomyState {
   setPointerPos: (pos: { x: number; y: number } | null) => void;
   setSelectedCategory: (categoryId: string | null) => void;
   setActivePopoverCategory: (category: CategoryData | null) => void;
+  openCascadingMenu: (category: CategoryData, defaultSubRegion?: string) => void;
+  closeCascadingMenu: () => void;
+  setActiveSubRegion: (subRegion: string | null) => void;
   setRegionFilter: (filter: RegionFilter) => void;
   setActiveLayerFilter: (layer: LayerFilter) => void;
   setCamera: (position: [number, number, number], target: [number, number, number]) => void;
@@ -41,6 +46,8 @@ export const useAnatomyStore = create<AnatomyState>((set) => ({
   pointerPos: null,
   selectedCategoryId: null,
   activePopoverCategory: null,
+  activeCascadingCategory: null,
+  activeSubRegion: null,
   regionFilter: 'all',
   activeLayerFilter: 'all',
   cameraPosition: DEFAULT_CAMERA_POS,
@@ -53,6 +60,22 @@ export const useAnatomyStore = create<AnatomyState>((set) => ({
   setPointerPos: (pos) => set({ pointerPos: pos }),
   setActivePopoverCategory: (category) => set({ activePopoverCategory: category }),
   setActiveLayerFilter: (layer) => set({ activeLayerFilter: layer }),
+
+  openCascadingMenu: (category, defaultSubRegion) => {
+    set({
+      activeCascadingCategory: category,
+      activeSubRegion: defaultSubRegion ?? null,
+      hoveredCardRegion: category.regionId,
+    });
+  },
+
+  closeCascadingMenu: () =>
+    set({
+      activeCascadingCategory: null,
+      activeSubRegion: null,
+    }),
+
+  setActiveSubRegion: (subRegion) => set({ activeSubRegion: subRegion }),
 
   setSelectedCategory: (categoryId) => {
     if (!categoryId) {
@@ -88,6 +111,8 @@ export const useAnatomyStore = create<AnatomyState>((set) => ({
       cameraTarget: DEFAULT_CAMERA_TARGET,
       selectedCategoryId: null,
       activePopoverCategory: null,
+      activeCascadingCategory: null,
+      activeSubRegion: null,
       hoveredCardRegion: null,
       hoveredRegion: null,
       hoveredSystem: null,

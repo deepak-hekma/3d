@@ -1,14 +1,20 @@
 import React from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { AnimatePresence } from 'framer-motion';
 import { BodyScene } from '../components/anatomy/BodyScene';
 import { CategoryCard } from '../components/ui/CategoryCard';
+import { CascadingConditionsMenu } from '../components/ui/CascadingConditionsMenu';
 import { CATEGORIES_DATA } from '../data/conditions-data';
 import { useAnatomyStore } from '../stores/anatomy-store';
 import { Info, RefreshCw, Layers } from 'lucide-react';
 
 export const ConditionsIndexRoute: React.FC = () => {
-  const navigate = useNavigate();
-  const { regionFilter, resetCamera } = useAnatomyStore();
+  const {
+    regionFilter,
+    resetCamera,
+    activeCascadingCategory,
+    openCascadingMenu,
+    closeCascadingMenu,
+  } = useAnatomyStore();
 
   const filteredCategories = CATEGORIES_DATA.filter((cat) => {
     if (regionFilter === 'all') return true;
@@ -18,14 +24,30 @@ export const ConditionsIndexRoute: React.FC = () => {
   });
 
   const handleRegionClick = (categoryId: string) => {
-    navigate({ to: '/conditions/$categoryId', params: { categoryId } });
+    const category = CATEGORIES_DATA.find((c) => c.id === categoryId);
+    if (category) {
+      openCascadingMenu(category);
+    }
   };
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] w-full bg-[#FAFBFC]">
+      {/* 3D WebGL Canvas Anatomical Viewport */}
       <div className="relative h-[500px] sm:h-[600px] w-full lg:fixed lg:top-16 lg:right-0 lg:bottom-0 lg:h-auto lg:w-1/2 z-0">
         <BodyScene onRegionClick={handleRegionClick} />
       </div>
+
+      {/* CASCADING CONDITIONS MENU (Triggered by Click on Card or 3D Organ) */}
+      <AnimatePresence>
+        {activeCascadingCategory && (
+          <div className="fixed top-20 right-4 sm:right-6 lg:left-[51%] xl:left-[52%] lg:right-auto z-40 max-w-2xl w-[calc(100vw-2rem)] sm:w-auto">
+            <CascadingConditionsMenu
+              category={activeCascadingCategory}
+              onClose={closeCascadingMenu}
+            />
+          </div>
+        )}
+      </AnimatePresence>
 
       <div className="relative z-10 w-full lg:w-1/2 px-4 sm:px-6 lg:px-8 py-6 flex flex-col justify-between min-h-[calc(54vh-0px)] lg:min-h-[calc(100vh-4rem)]">
         <div className="flex flex-wrap items-center justify-between gap-3">

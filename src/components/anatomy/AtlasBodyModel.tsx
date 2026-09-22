@@ -16,7 +16,7 @@ interface AtlasBodyModelProps {
   onRegionClick?: (categoryId: string) => void;
 }
 
-// Rich medical palette with physically accurate roughness & clearcoat gloss
+// Rich medical palette with physically accurate roughness & clearcoat gloss matching human-atlas
 const NATURAL_PALETTE: Record<
   string,
   {
@@ -31,37 +31,37 @@ const NATURAL_PALETTE: Record<
   }
 > = {
   skeletal: {
-    color: '#EFE8DA',
-    opacity: 0.98,
-    emissive: '#2A241C',
-    emissiveIntensity: 0.03,
-    roughness: 0.42,
-    clearcoat: 0.3,
+    color: '#E8E2D5',
+    opacity: 0.32, // Translucent pearl bone in default view so internal organs (brain, lungs, heart) are clearly visible
+    emissive: '#1F1B16',
+    emissiveIntensity: 0.02,
+    roughness: 0.45,
+    clearcoat: 0.25,
     clearcoatRoughness: 0.2,
-    metalness: 0.05,
+    metalness: 0.04,
   },
   muscular: {
-    color: '#A3433B',
-    opacity: 0.20,
-    emissive: '#261210',
+    color: '#A85B50',
+    opacity: 0.08, // Soft ghost muscle fibers so they do not block internal organs
+    emissive: '#200D0B',
     emissiveIntensity: 0.02,
-    roughness: 0.38,
-    clearcoat: 0.2,
+    roughness: 0.4,
+    clearcoat: 0.15,
     clearcoatRoughness: 0.3,
     metalness: 0.04,
   },
   cardiac: {
-    color: '#DC2626',
+    color: '#B96760', // Vibrant heart
     opacity: 1.0,
     emissive: '#450A0A',
-    emissiveIntensity: 0.05,
+    emissiveIntensity: 0.08,
     roughness: 0.22,
     clearcoat: 0.85,
     clearcoatRoughness: 0.1,
     metalness: 0.08,
   },
   sensory: {
-    color: '#06B6D4',
+    color: '#06B6D4', // Eyes & sensory
     opacity: 1.0,
     emissive: '#164E63',
     emissiveIntensity: 0.05,
@@ -71,27 +71,27 @@ const NATURAL_PALETTE: Record<
     metalness: 0.1,
   },
   nervous: {
-    color: '#F59E0B',
+    color: '#D8B565', // Rich amber gold for Brain & Nerves
     opacity: 1.0,
     emissive: '#78350F',
-    emissiveIntensity: 0.05,
-    roughness: 0.28,
-    clearcoat: 0.6,
-    clearcoatRoughness: 0.15,
+    emissiveIntensity: 0.08,
+    roughness: 0.26,
+    clearcoat: 0.7,
+    clearcoatRoughness: 0.12,
     metalness: 0.06,
   },
   respiratory: {
-    color: '#DB7093',
+    color: '#DB7093', // Distinct soft rose for Lungs & Airways
     opacity: 1.0,
     emissive: '#500724',
-    emissiveIntensity: 0.05,
-    roughness: 0.32,
+    emissiveIntensity: 0.06,
+    roughness: 0.3,
     clearcoat: 0.65,
     clearcoatRoughness: 0.12,
     metalness: 0.05,
   },
   endocrine: {
-    color: '#A855F7',
+    color: '#C5A09A', // Pancreas / glands
     opacity: 1.0,
     emissive: '#3B0764',
     emissiveIntensity: 0.05,
@@ -101,17 +101,17 @@ const NATURAL_PALETTE: Record<
     metalness: 0.06,
   },
   digestive: {
-    color: '#C4683C',
+    color: '#C4683C', // Warm terracotta for stomach, liver, intestines
     opacity: 1.0,
     emissive: '#431407',
-    emissiveIntensity: 0.05,
+    emissiveIntensity: 0.06,
     roughness: 0.25,
     clearcoat: 0.8,
     clearcoatRoughness: 0.12,
     metalness: 0.06,
   },
   urinary: {
-    color: '#D97706',
+    color: '#D97706', // Amber gold for kidneys & bladder
     opacity: 1.0,
     emissive: '#451A03',
     emissiveIntensity: 0.05,
@@ -121,7 +121,7 @@ const NATURAL_PALETTE: Record<
     metalness: 0.06,
   },
   lymphatic: {
-    color: '#10B981',
+    color: '#879F7C', // Soft sage green for lymph nodes
     opacity: 1.0,
     emissive: '#064E3B',
     emissiveIntensity: 0.05,
@@ -155,6 +155,7 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
     const map = new Map<SystemId, THREE.MeshPhysicalMaterial>();
     for (const { system } of meshes) {
       const natural = NATURAL_PALETTE[system] ?? NATURAL_PALETTE.skeletal;
+      const isTranslucent = system === 'muscular' || system === 'skeletal';
       const material = new THREE.MeshPhysicalMaterial({
         color: natural.color,
         emissive: natural.emissive,
@@ -163,10 +164,10 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
         metalness: natural.metalness,
         clearcoat: natural.clearcoat,
         clearcoatRoughness: natural.clearcoatRoughness,
-        transparent: system === 'muscular',
+        transparent: isTranslucent,
         opacity: natural.opacity,
         side: THREE.DoubleSide,
-        depthWrite: system !== 'muscular',
+        depthWrite: !isTranslucent,
       });
       map.set(system, material);
     }
@@ -278,14 +279,15 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
         }
       } else {
         // NATURAL RESTING STATE
+        const isTranslucent = system === 'muscular' || system === 'skeletal';
         material.color.set(natural.color);
         material.emissive.set(natural.emissive);
         material.emissiveIntensity = natural.emissiveIntensity;
         material.roughness = natural.roughness;
         material.clearcoat = natural.clearcoat;
         material.opacity = natural.opacity;
-        material.transparent = system === 'muscular';
-        material.depthWrite = system !== 'muscular';
+        material.transparent = isTranslucent;
+        material.depthWrite = !isTranslucent;
       }
     });
   }, [highlighted, materials, activeLayerFilter]);
@@ -333,12 +335,15 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
     if (mapping && onRegionClick) onRegionClick(mapping.categoryId);
   };
 
-  // Define renderOrder priority
+  // Define renderOrder priority:
+  // Organs render first (solid, depthWrite: true).
+  // Translucent skeletal & muscular wrap around them.
+  // Highlighted target system gets top priority so it shines through everything.
   const getRenderOrder = (system: SystemId) => {
-    if (highlighted.has(system)) return 25;
-    if (ORGAN_SYSTEMS.has(system)) return 15;
-    if (system === 'skeletal') return 5;
-    return 1; // muscular
+    if (highlighted.has(system)) return 35;
+    if (ORGAN_SYSTEMS.has(system)) return 10;
+    if (system === 'skeletal') return 20;
+    return 25; // muscular
   };
 
   return (

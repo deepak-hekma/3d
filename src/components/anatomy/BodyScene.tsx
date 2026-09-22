@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Environment } from '@react-three/drei';
 import { AtlasBodyModel } from './AtlasBodyModel';
 import { CameraController } from './CameraController';
 import { AtlasSkeleton } from './AtlasSkeleton';
@@ -34,7 +35,14 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
           camera={{ position: [0.4, 1.05, 3.05], fov: 34 }}
           shadows
           dpr={dpr}
-          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance', failIfMajorPerformanceCaveat: false }}
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance',
+            failIfMajorPerformanceCaveat: false,
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 1.05,
+          }}
           style={{ width: '100%', height: '100%' }}
           onCreated={({ gl }) => {
             const canvas = gl.domElement;
@@ -48,10 +56,29 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
             );
           }}
         >
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[5, 10, 7]} intensity={1.2} color="#FFFFFF" castShadow />
-          <directionalLight position={[-5, 5, -5]} intensity={0.6} color="#E0F2FE" />
-          <pointLight position={[0, 2, 2]} intensity={0.5} color="#ED248F" />
+          {/* Studio IBL Environment for realistic specular reflections on physical materials */}
+          <Environment preset="studio" />
+
+          {/* Balanced lighting with clear shadows & depth */}
+          <ambientLight intensity={0.35} />
+          
+          {/* Key Light (Front-Right) */}
+          <directionalLight
+            position={[5, 10, 7]}
+            intensity={1.4}
+            color="#FFFFFF"
+            castShadow
+            shadow-mapSize={[1024, 1024]}
+          />
+          
+          {/* Fill Light (Soft Cool Medical Fill from Front-Left) */}
+          <directionalLight position={[-6, 4, -4]} intensity={0.5} color="#E0F2FE" />
+          
+          {/* Rim / Silhouette Back Light (Enhances organ edge separation) */}
+          <directionalLight position={[0, 6, -6]} intensity={0.8} color="#F8FAFC" />
+          
+          {/* Subtle Pink Medical Accent Light */}
+          <pointLight position={[0, 2, 2.5]} intensity={0.3} color="#ED248F" />
 
           <AtlasBodyModel meshes={meshes} onRegionClick={onRegionClick} />
           <CameraController />

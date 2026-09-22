@@ -20,19 +20,24 @@ const ICON_MAP: Record<string, any> = {
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   const navigate = useNavigate();
-  const { hoveredRegion, setHoveredRegion, setSelectedCategory, selectedCategoryId } = useAnatomyStore();
+  const {
+    hoveredCardRegion,
+    setHoveredCardRegion,
+    setSelectedCategory,
+    selectedCategoryId,
+  } = useAnatomyStore();
 
-  const isHovered = hoveredRegion === category.regionId;
+  const isHovered = hoveredCardRegion === category.regionId;
   const isSelected = selectedCategoryId === category.id;
 
   const IconComponent = ICON_MAP[category.iconName] || Activity;
 
   const handleMouseEnter = () => {
-    setHoveredRegion(category.regionId);
+    setHoveredCardRegion(category.regionId);
   };
 
   const handleMouseLeave = () => {
-    setHoveredRegion(null);
+    setHoveredCardRegion(null);
   };
 
   const handleClick = () => {

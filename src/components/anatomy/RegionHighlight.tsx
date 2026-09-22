@@ -2,6 +2,8 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAnatomyStore } from '../../stores/anatomy-store';
 import { CATEGORIES_DATA } from '../../data/conditions-data';
+import { categoryForSystem } from '../../lib/atlas/region-map';
+import type { SystemId } from '../../lib/atlas/types';
 
 const SYSTEM_NAMES: Record<string, string> = {
   skeletal: 'Skeletal System (Bones & Joints)',
@@ -17,9 +19,10 @@ const SYSTEM_NAMES: Record<string, string> = {
 };
 
 export const RegionHighlight: React.FC = () => {
-  const { hoveredRegion, hoveredSystem, pointerPos } = useAnatomyStore();
+  const { hoveredSystem, pointerPos } = useAnatomyStore();
 
-  const activeCategory = CATEGORIES_DATA.find((c) => c.regionId === hoveredRegion);
+  const mapping = hoveredSystem ? categoryForSystem(hoveredSystem as SystemId) : undefined;
+  const activeCategory = mapping ? CATEGORIES_DATA.find((c) => c.id === mapping.categoryId) : undefined;
   const systemLabel = hoveredSystem ? SYSTEM_NAMES[hoveredSystem] ?? hoveredSystem : null;
 
   return (

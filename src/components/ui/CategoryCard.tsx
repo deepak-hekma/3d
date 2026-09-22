@@ -20,12 +20,13 @@ const ICON_MAP: Record<string, any> = {
 export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   const {
     hoveredCardRegion,
+    hoveredRegion,
     setHoveredCardRegion,
     openCascadingMenu,
     activeCascadingCategory,
   } = useAnatomyStore();
 
-  const isHovered = hoveredCardRegion === category.regionId;
+  const isHovered = hoveredCardRegion === category.regionId || hoveredRegion === category.regionId;
   const isSelected = activeCascadingCategory?.id === category.id;
 
   const IconComponent = ICON_MAP[category.iconName] || Activity;

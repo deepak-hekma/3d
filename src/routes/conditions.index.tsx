@@ -78,7 +78,7 @@ export const ConditionsIndexRoute: React.FC = () => {
           <div className="glass-panel px-4 py-3 rounded-2xl text-xs text-slate-600 font-medium flex items-center gap-3 bg-white/90 border border-slate-200/80 shadow-sm">
             <Info className="w-4 h-4 text-[#06B6D4] shrink-0" />
             <span>
-              Hover a category card to spotlight that system on the 3D model. Click a card to explore conditions and recruiting trials.
+              Hover the 3D model to focus a system. Click a part or category card to explore conditions and recruiting trials.
             </span>
           </div>
         </div>

@@ -13,10 +13,17 @@ interface BodySceneProps {
   onRegionClick?: (categoryId: string) => void;
 }
 
+function clearModelHover() {
+  const store = useAnatomyStore.getState();
+  store.setHoveredSystem(null);
+  store.setHoveredRegion(null);
+  store.setPointerPos(null);
+  document.body.style.cursor = 'auto';
+}
+
 export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
   const [retry, setRetry] = useState(0);
   const [contextLost, setContextLost] = useState(false);
-  const { activeLayerFilter, setActiveLayerFilter } = useAnatomyStore();
   const { status, progress, error, meshes } = useAtlas(retry);
   const failed = status === 'error' || contextLost;
   const mobile = typeof window !== 'undefined' && window.innerWidth < 768;
@@ -31,6 +38,7 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
       className="relative h-full w-full pointer-events-auto overflow-hidden bg-[#FAFBFC]"
       data-atlas-status={status}
       data-atlas-meshes={meshes.length}
+      onPointerLeave={clearModelHover}
     >
       {status === 'ready' && !contextLost && (
         <Canvas
@@ -129,32 +137,6 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {status === 'ready' && !contextLost && (
-        <div className="absolute top-3 right-3 z-20 flex items-center gap-0.5 p-0.5 rounded-xl bg-white/90 backdrop-blur-xl border border-slate-200/90 shadow-sm pointer-events-auto">
-          {(
-            [
-              { id: 'all', label: 'All' },
-              { id: 'organs', label: 'Organs' },
-              { id: 'skeleton', label: 'Skeleton' },
-              { id: 'muscular', label: 'Muscular' },
-            ] as const
-          ).map((layer) => (
-            <button
-              key={layer.id}
-              type="button"
-              onClick={() => setActiveLayerFilter(layer.id)}
-              className={`px-2 py-1 rounded-lg text-[10px] font-bold leading-none transition-all cursor-pointer ${
-                activeLayerFilter === layer.id
-                  ? 'bg-[#0B132B] text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
-              }`}
-            >
-              {layer.label}
-            </button>
-          ))}
         </div>
       )}
 

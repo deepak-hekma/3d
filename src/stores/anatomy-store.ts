@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { CATEGORIES_DATA, type CategoryData } from '../data/conditions-data';
 
 export type RegionFilter = 'all' | 'us' | 'uae';
-export type LayerFilter = 'all' | 'organs' | 'skeleton' | 'muscular';
 
 interface AnatomyState {
   hoveredRegion: string | null;
@@ -14,7 +13,6 @@ interface AnatomyState {
   activeCascadingCategory: CategoryData | null;
   activeSubRegion: string | null;
   regionFilter: RegionFilter;
-  activeLayerFilter: LayerFilter;
   cameraPosition: [number, number, number];
   cameraTarget: [number, number, number];
   is3dLoaded: boolean;
@@ -30,7 +28,6 @@ interface AnatomyState {
   closeCascadingMenu: () => void;
   setActiveSubRegion: (subRegion: string | null) => void;
   setRegionFilter: (filter: RegionFilter) => void;
-  setActiveLayerFilter: (layer: LayerFilter) => void;
   setCamera: (position: [number, number, number], target: [number, number, number]) => void;
   setIs3dLoaded: (loaded: boolean) => void;
   resetCamera: () => void;
@@ -49,7 +46,6 @@ export const useAnatomyStore = create<AnatomyState>((set) => ({
   activeCascadingCategory: null,
   activeSubRegion: null,
   regionFilter: 'all',
-  activeLayerFilter: 'all',
   cameraPosition: DEFAULT_CAMERA_POS,
   cameraTarget: DEFAULT_CAMERA_TARGET,
   is3dLoaded: false,
@@ -59,7 +55,6 @@ export const useAnatomyStore = create<AnatomyState>((set) => ({
   setHoveredSystem: (system) => set({ hoveredSystem: system }),
   setPointerPos: (pos) => set({ pointerPos: pos }),
   setActivePopoverCategory: (category) => set({ activePopoverCategory: category }),
-  setActiveLayerFilter: (layer) => set({ activeLayerFilter: layer }),
 
   openCascadingMenu: (category, defaultSubRegion) => {
     set({

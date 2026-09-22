@@ -145,10 +145,11 @@ function pickFromIntersections(intersections: THREE.Intersection[]): SystemId | 
 export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegionClick }) => {
   const {
     hoveredCardRegion,
+    hoveredSystem,
     setHoveredSystem,
+    setHoveredRegion,
     setPointerPos,
     selectedCategoryId,
-    activeLayerFilter,
   } = useAnatomyStore();
 
   const materials = useMemo(() => {
@@ -181,11 +182,12 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
   }, [materials]);
 
   const highlighted = useMemo(() => {
+    if (hoveredSystem) return new Set<SystemId>([hoveredSystem]);
     const fromCard = systemsForRegion(hoveredCardRegion);
     if (fromCard.size) return fromCard;
     const category = CATEGORIES_DATA.find((entry) => entry.id === selectedCategoryId);
     return systemsForRegion(category?.regionId ?? null);
-  }, [hoveredCardRegion, selectedCategoryId]);
+  }, [hoveredSystem, hoveredCardRegion, selectedCategoryId]);
 
   useEffect(() => {
     const hasHighlight = highlighted.size > 0;
@@ -194,54 +196,6 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
     materials.forEach((material, system) => {
       const natural = NATURAL_PALETTE[system] ?? NATURAL_PALETTE.skeletal;
       const isOn = highlighted.has(system);
-      const isOrgan = ORGAN_SYSTEMS.has(system);
-
-      // 1. Layer Isolation Filter
-      if (activeLayerFilter === 'organs') {
-        if (!isOrgan) {
-          material.opacity = 0.02;
-          material.transparent = true;
-          material.depthWrite = false;
-          material.emissiveIntensity = 0;
-          return;
-        }
-      } else if (activeLayerFilter === 'skeleton') {
-        if (system !== 'skeletal') {
-          material.opacity = 0.02;
-          material.transparent = true;
-          material.depthWrite = false;
-          material.emissiveIntensity = 0;
-          return;
-        } else {
-          material.opacity = 1.0;
-          material.transparent = false;
-          material.depthWrite = true;
-          material.color.set(natural.color);
-          material.emissiveIntensity = 0.03;
-          return;
-        }
-      } else if (activeLayerFilter === 'muscular') {
-        if (system === 'muscular') {
-          material.opacity = 0.85;
-          material.transparent = false;
-          material.depthWrite = true;
-          material.color.set('#B91C1C');
-          material.emissiveIntensity = 0.03;
-          return;
-        } else if (system === 'skeletal') {
-          material.opacity = 0.45;
-          material.transparent = true;
-          material.depthWrite = false;
-          return;
-        } else {
-          material.opacity = 0.04;
-          material.transparent = true;
-          material.depthWrite = false;
-          return;
-        }
-      }
-
-      // 2. Highlight & Smart Auto-Peeling when a card is targeted
       if (hasHighlight) {
         if (isOn) {
           // TARGET ORGAN / SYSTEM
@@ -290,36 +244,31 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
         material.depthWrite = !isTranslucent;
       }
     });
-  }, [highlighted, materials, activeLayerFilter]);
+  }, [highlighted, materials]);
 
-  const handlePointerMove = (event: any) => {
+  const handlePointerMove = (event: {
+    stopPropagation: () => void;
+    intersections: THREE.Intersection[];
+    nativeEvent?: PointerEvent | MouseEvent;
+  }) => {
     const system = pickFromIntersections(event.intersections);
     if (!system) return;
     event.stopPropagation();
     setHoveredSystem(system);
-    const clientX =
-      event.clientX ??
-      event.nativeEvent?.clientX ??
-      (event.pointer && typeof window !== 'undefined'
-        ? (event.pointer.x + 1) * 0.5 * window.innerWidth
-        : undefined);
-    const clientY =
-      event.clientY ??
-      event.nativeEvent?.clientY ??
-      (event.pointer && typeof window !== 'undefined'
-        ? (1 - (event.pointer.y + 1) * 0.5) * window.innerHeight
-        : undefined);
-
-    if (clientX !== undefined && clientY !== undefined) {
-      setPointerPos({ x: clientX, y: clientY });
+    const mapping = categoryForSystem(system);
+    setHoveredRegion(mapping?.regionId ?? null);
+    const native = event.nativeEvent;
+    if (native && 'clientX' in native) {
+      setPointerPos({ x: native.clientX + 14, y: native.clientY + 18 });
     }
     document.body.style.cursor = 'pointer';
   };
 
-  const handlePointerOut = (event: any) => {
+  const handlePointerOut = (event: { intersections: THREE.Intersection[] }) => {
     const system = pickFromIntersections(event.intersections);
     if (system) return;
     setHoveredSystem(null);
+    setHoveredRegion(null);
     setPointerPos(null);
     document.body.style.cursor = 'auto';
   };

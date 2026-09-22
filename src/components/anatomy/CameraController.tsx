@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -26,44 +26,69 @@ export function CameraController() {
   const { camera, controls } = useThree();
   const { hoveredCardRegion, selectedCategoryId } = useAnatomyStore();
 
-  const targetPosRef = useRef(new THREE.Vector3());
-  const targetLookAtRef = useRef(new THREE.Vector3());
+  const isTransitioningRef = useRef(false);
+  const targetPosRef = useRef(new THREE.Vector3().copy(DEFAULT_POS));
+  const targetLookAtRef = useRef(new THREE.Vector3().copy(DEFAULT_TARGET));
+  const prevTriggerRef = useRef<string | null>(null);
 
-  useFrame((_, delta) => {
-    // Determine target position based on card hover or selection
-    let desiredPos = DEFAULT_POS;
-    let desiredTarget = DEFAULT_TARGET;
+  // Detect when card hover or category selection triggers a camera focus change
+  useEffect(() => {
+    const currentTrigger = hoveredCardRegion || selectedCategoryId || null;
+    if (currentTrigger !== prevTriggerRef.current) {
+      prevTriggerRef.current = currentTrigger;
 
-    if (hoveredCardRegion && REGION_CAMERA_MAP[hoveredCardRegion]) {
-      const config = REGION_CAMERA_MAP[hoveredCardRegion];
-      targetPosRef.current.set(...config.position);
-      targetLookAtRef.current.set(...config.target);
-      desiredPos = targetPosRef.current;
-      desiredTarget = targetLookAtRef.current;
-    } else if (selectedCategoryId) {
-      const category = CATEGORIES_DATA.find((c) => c.id === selectedCategoryId);
-      if (category && REGION_CAMERA_MAP[category.regionId]) {
-        const config = REGION_CAMERA_MAP[category.regionId];
+      if (hoveredCardRegion && REGION_CAMERA_MAP[hoveredCardRegion]) {
+        const config = REGION_CAMERA_MAP[hoveredCardRegion];
         targetPosRef.current.set(...config.position);
         targetLookAtRef.current.set(...config.target);
-        desiredPos = targetPosRef.current;
-        desiredTarget = targetLookAtRef.current;
+        isTransitioningRef.current = true;
+      } else if (selectedCategoryId) {
+        const category = CATEGORIES_DATA.find((c) => c.id === selectedCategoryId);
+        if (category && REGION_CAMERA_MAP[category.regionId]) {
+          const config = REGION_CAMERA_MAP[category.regionId];
+          targetPosRef.current.set(...config.position);
+          targetLookAtRef.current.set(...config.target);
+          isTransitioningRef.current = true;
+        }
+      } else {
+        // Return to default full-body view
+        targetPosRef.current.copy(DEFAULT_POS);
+        targetLookAtRef.current.copy(DEFAULT_TARGET);
+        isTransitioningRef.current = true;
       }
     }
+  }, [hoveredCardRegion, selectedCategoryId]);
 
-    // Frame-rate independent smooth dampening (smooth ease-out)
-    const dampFactor = 1 - Math.exp(-4.5 * delta);
+  useFrame((_, delta) => {
+    // Only interpolate camera when an automated transition is active.
+    // Once transition finishes, release control so user has 100% free OrbitControls zoom / rotate.
+    if (!isTransitioningRef.current) return;
 
-    // Smoothly interpolate camera position
-    camera.position.lerp(desiredPos, dampFactor);
+    const dampFactor = 1 - Math.exp(-5.0 * delta);
 
-    // Smoothly interpolate orbit controls target
+    camera.position.lerp(targetPosRef.current, dampFactor);
+
     const orbit = controls as OrbitControls | null;
     if (orbit && 'target' in orbit) {
-      orbit.target.lerp(desiredTarget, dampFactor);
+      orbit.target.lerp(targetLookAtRef.current, dampFactor);
       orbit.update();
     } else {
-      camera.lookAt(desiredTarget);
+      camera.lookAt(targetLookAtRef.current);
+    }
+
+    // When camera is close enough to target, finish transition
+    const posDist = camera.position.distanceTo(targetPosRef.current);
+    const targetDist = orbit && 'target' in orbit
+      ? orbit.target.distanceTo(targetLookAtRef.current)
+      : 0;
+
+    if (posDist < 0.008 && targetDist < 0.008) {
+      camera.position.copy(targetPosRef.current);
+      if (orbit && 'target' in orbit) {
+        orbit.target.copy(targetLookAtRef.current);
+        orbit.update();
+      }
+      isTransitioningRef.current = false;
     }
   });
 

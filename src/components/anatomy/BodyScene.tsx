@@ -87,11 +87,19 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
             makeDefault
             enablePan={false}
             enableZoom={true}
-            minDistance={1.2}
-            maxDistance={5.5}
+            enableDamping={true}
+            dampingFactor={0.06}
+            rotateSpeed={0.85}
+            zoomSpeed={1.2}
+            minDistance={0.8}
+            maxDistance={6.0}
             maxPolarAngle={Math.PI / 1.75}
             minPolarAngle={Math.PI / 3.4}
             target={[0, 0.85, 0]}
+            touches={{
+              ONE: THREE.TOUCH.ROTATE,
+              TWO: THREE.TOUCH.DOLLY_PAN,
+            }}
           />
         </Canvas>
       )}

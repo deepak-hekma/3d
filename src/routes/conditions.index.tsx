@@ -23,14 +23,11 @@ export const ConditionsIndexRoute: React.FC = () => {
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] w-full bg-[#FAFBFC]">
-      {/* 3D WebGL Canvas Anatomical Viewport */}
       <div className="relative h-[500px] sm:h-[600px] w-full lg:fixed lg:top-16 lg:right-0 lg:bottom-0 lg:h-auto lg:w-1/2 z-0">
         <BodyScene onRegionClick={handleRegionClick} />
       </div>
 
-      {/* LEFT-SIDE SCROLLABLE GLASS CONTENT */}
       <div className="relative z-10 w-full lg:w-1/2 px-4 sm:px-6 lg:px-8 py-6 flex flex-col justify-between min-h-[calc(54vh-0px)] lg:min-h-[calc(100vh-4rem)]">
-        {/* Top Control Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="glass-panel px-4 py-2 rounded-2xl flex items-center gap-2.5 border border-slate-200/90 shadow-sm bg-white/90">
             <div className="w-2.5 h-2.5 rounded-full bg-[#ED248F] animate-pulse" />
@@ -49,19 +46,17 @@ export const ConditionsIndexRoute: React.FC = () => {
           </button>
         </div>
 
-        {/* Category Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-8">
           {filteredCategories.map((category) => (
             <CategoryCard key={category.id} category={category} />
           ))}
         </div>
 
-        {/* Bottom Educational Micro-Callout */}
         <div className="pt-2 pb-4">
           <div className="glass-panel px-4 py-3 rounded-2xl text-xs text-slate-600 font-medium flex items-center gap-3 bg-white/90 border border-slate-200/80 shadow-sm">
             <Info className="w-4 h-4 text-[#06B6D4] shrink-0" />
             <span>
-              Hover any card or anatomical system to spotlight organs in real-time 3D. Click to explore conditions and recruiting clinical trials.
+              Hover a category card to spotlight that system on the 3D model. Click a card to explore conditions and recruiting trials.
             </span>
           </div>
         </div>

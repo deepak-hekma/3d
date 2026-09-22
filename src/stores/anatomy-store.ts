@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { CATEGORIES_DATA } from '../data/conditions-data';
+import { CATEGORIES_DATA, type CategoryData } from '../data/conditions-data';
 
 export type RegionFilter = 'all' | 'us' | 'uae';
 export type LayerFilter = 'all' | 'organs' | 'skeleton' | 'muscular';
@@ -10,6 +10,7 @@ interface AnatomyState {
   hoveredSystem: string | null;
   pointerPos: { x: number; y: number } | null;
   selectedCategoryId: string | null;
+  activePopoverCategory: CategoryData | null;
   regionFilter: RegionFilter;
   activeLayerFilter: LayerFilter;
   cameraPosition: [number, number, number];
@@ -22,6 +23,7 @@ interface AnatomyState {
   setHoveredSystem: (system: string | null) => void;
   setPointerPos: (pos: { x: number; y: number } | null) => void;
   setSelectedCategory: (categoryId: string | null) => void;
+  setActivePopoverCategory: (category: CategoryData | null) => void;
   setRegionFilter: (filter: RegionFilter) => void;
   setActiveLayerFilter: (layer: LayerFilter) => void;
   setCamera: (position: [number, number, number], target: [number, number, number]) => void;
@@ -38,6 +40,7 @@ export const useAnatomyStore = create<AnatomyState>((set) => ({
   hoveredSystem: null,
   pointerPos: null,
   selectedCategoryId: null,
+  activePopoverCategory: null,
   regionFilter: 'all',
   activeLayerFilter: 'all',
   cameraPosition: DEFAULT_CAMERA_POS,
@@ -48,6 +51,7 @@ export const useAnatomyStore = create<AnatomyState>((set) => ({
   setHoveredCardRegion: (region) => set({ hoveredCardRegion: region }),
   setHoveredSystem: (system) => set({ hoveredSystem: system }),
   setPointerPos: (pos) => set({ pointerPos: pos }),
+  setActivePopoverCategory: (category) => set({ activePopoverCategory: category }),
   setActiveLayerFilter: (layer) => set({ activeLayerFilter: layer }),
 
   setSelectedCategory: (categoryId) => {
@@ -83,6 +87,7 @@ export const useAnatomyStore = create<AnatomyState>((set) => ({
       cameraPosition: DEFAULT_CAMERA_POS,
       cameraTarget: DEFAULT_CAMERA_TARGET,
       selectedCategoryId: null,
+      activePopoverCategory: null,
       hoveredCardRegion: null,
       hoveredRegion: null,
       hoveredSystem: null,

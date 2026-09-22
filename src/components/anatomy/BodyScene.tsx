@@ -1,0 +1,112 @@
+import React, { useEffect, useState } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { AtlasBodyModel } from './AtlasBodyModel';
+import { CameraController } from './CameraController';
+import { AtlasSkeleton } from './AtlasSkeleton';
+import { RegionHighlight } from './RegionHighlight';
+import { useAtlas } from '../../lib/atlas/useAtlas';
+
+interface BodySceneProps {
+  onRegionClick?: (categoryId: string) => void;
+}
+
+export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
+  const [retry, setRetry] = useState(0);
+  const [contextLost, setContextLost] = useState(false);
+  const { status, progress, error, meshes } = useAtlas(retry);
+  const failed = status === 'error' || contextLost;
+  const mobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const dpr: [number, number] = [1, mobile ? 1.5 : 2];
+
+  useEffect(() => {
+    setContextLost(false);
+  }, [retry]);
+
+  return (
+    <div
+      className="relative h-full w-full pointer-events-auto overflow-hidden bg-[#FAFBFC]"
+      data-atlas-status={status}
+      data-atlas-meshes={meshes.length}
+    >
+      {status === 'ready' && !contextLost && (
+        <Canvas
+          camera={{ position: [0.4, 1.05, 3.05], fov: 34 }}
+          shadows
+          dpr={dpr}
+          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance', failIfMajorPerformanceCaveat: false }}
+          style={{ width: '100%', height: '100%' }}
+          onCreated={({ gl }) => {
+            const canvas = gl.domElement;
+            canvas.addEventListener(
+              'webglcontextlost',
+              (event) => {
+                event.preventDefault();
+                setContextLost(true);
+              },
+              { once: true },
+            );
+          }}
+        >
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[5, 10, 7]} intensity={1.2} color="#FFFFFF" castShadow />
+          <directionalLight position={[-5, 5, -5]} intensity={0.6} color="#E0F2FE" />
+          <pointLight position={[0, 2, 2]} intensity={0.5} color="#ED248F" />
+
+          <AtlasBodyModel meshes={meshes} onRegionClick={onRegionClick} />
+          <CameraController />
+
+          <OrbitControls
+            makeDefault
+            enablePan={false}
+            enableZoom={true}
+            minDistance={1.2}
+            maxDistance={5.5}
+            maxPolarAngle={Math.PI / 1.75}
+            minPolarAngle={Math.PI / 3.4}
+            target={[0, 0.85, 0]}
+          />
+        </Canvas>
+      )}
+
+      {status === 'loading' && <AtlasSkeleton progress={progress} />}
+
+      {failed && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#FAFBFC]/80 backdrop-blur-md">
+          <div className="glass-panel max-w-md mx-4 p-6 rounded-2xl border border-slate-200/80 bg-white/95 text-center">
+            <p className="text-sm font-bold text-[#0B132B]">
+              {contextLost ? 'The 3D viewer lost its graphics context.' : 'The 3D anatomy model could not be loaded.'}
+            </p>
+            <p className="text-xs text-slate-600 mt-2">
+              {contextLost
+                ? 'Please retry to restore the 3D viewer.'
+                : error ?? 'Please retry to load the anatomy model.'}
+            </p>
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setRetry((value) => value + 1)}
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0B132B] text-white"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {status === 'ready' && !contextLost && (
+        <a
+          href="/ATTRIBUTION.md"
+          className="absolute bottom-4 left-4 z-20 text-[10px] font-medium text-slate-500 hover:text-slate-700 bg-white/70 backdrop-blur-sm px-2 py-1 rounded-lg pointer-events-auto"
+        >
+          Anatomy: BodyParts3D · CC BY 4.0
+        </a>
+      )}
+
+      <RegionHighlight />
+    </div>
+  );
+};
+
+export default BodyScene;

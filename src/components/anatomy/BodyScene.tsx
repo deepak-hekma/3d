@@ -132,13 +132,12 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
         </div>
       )}
 
-      {/* Floating Anatomical Layer Selector (All Systems | Organs Only | Skeleton | Muscular) */}
       {status === 'ready' && !contextLost && (
-        <div className="absolute top-4 left-4 z-20 flex items-center gap-1 p-1 rounded-2xl bg-white/90 backdrop-blur-xl border border-slate-200/90 shadow-md pointer-events-auto">
+        <div className="absolute top-3 right-3 z-20 flex items-center gap-0.5 p-0.5 rounded-xl bg-white/90 backdrop-blur-xl border border-slate-200/90 shadow-sm pointer-events-auto">
           {(
             [
-              { id: 'all', label: 'All Systems' },
-              { id: 'organs', label: 'Organs Only' },
+              { id: 'all', label: 'All' },
+              { id: 'organs', label: 'Organs' },
               { id: 'skeleton', label: 'Skeleton' },
               { id: 'muscular', label: 'Muscular' },
             ] as const
@@ -147,7 +146,7 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
               key={layer.id}
               type="button"
               onClick={() => setActiveLayerFilter(layer.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-2 py-1 rounded-lg text-[10px] font-bold leading-none transition-all cursor-pointer ${
                 activeLayerFilter === layer.id
                   ? 'bg-[#0B132B] text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'

@@ -51,14 +51,14 @@ export const ORGAN_SYSTEMS = new Set<SystemId>([
 ]);
 
 export const SYSTEM_TO_CATEGORY: Partial<Record<SystemId, { regionId: AnatomyRegionId; categoryId: string }>> = {
-  nervous: { regionId: 'cranium', categoryId: 'neurology' },
-  sensory: { regionId: 'cranium', categoryId: 'neurology' },
-  lymphatic: { regionId: 'thorax', categoryId: 'oncology' },
-  cardiac: { regionId: 'thorax-left', categoryId: 'cardiology' },
+  nervous: { regionId: 'cranium', categoryId: 'neurological' },
+  sensory: { regionId: 'cranium', categoryId: 'eye-diseases' },
+  lymphatic: { regionId: 'thorax', categoryId: 'cancer' },
+  cardiac: { regionId: 'thorax-left', categoryId: 'cardiovascular' },
   respiratory: { regionId: 'thorax-right', categoryId: 'respiratory' },
-  endocrine: { regionId: 'abdomen', categoryId: 'endocrine' },
-  digestive: { regionId: 'abdomen-lower', categoryId: 'gastroenterology' },
-  urinary: { regionId: 'abdomen-lower', categoryId: 'gastroenterology' },
+  endocrine: { regionId: 'abdomen', categoryId: 'endocrine-metabolic' },
+  digestive: { regionId: 'abdomen-lower', categoryId: 'digestive-liver' },
+  urinary: { regionId: 'abdomen-lower', categoryId: 'kidney-urinary' },
   skeletal: { regionId: 'skeleton', categoryId: 'musculoskeletal' },
   muscular: { regionId: 'skeleton', categoryId: 'musculoskeletal' },
 };

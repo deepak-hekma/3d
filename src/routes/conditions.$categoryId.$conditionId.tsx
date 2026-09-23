@@ -59,7 +59,7 @@ export const ConditionDetailRoute: React.FC = () => {
       {/* Header Banner */}
       <div className="glass-panel border-b border-slate-200/80 bg-white/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-2 mb-4">
             <Link
               to="/conditions/$categoryId"
               params={{ categoryId: categoryId || '' }}
@@ -67,6 +67,21 @@ export const ConditionDetailRoute: React.FC = () => {
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
+            <Link
+              to="/conditions"
+              className="text-xs font-semibold text-slate-500 hover:text-[#0B132B]"
+            >
+              Categories
+            </Link>
+            <span className="text-slate-300">/</span>
+            <Link
+              to="/conditions/$categoryId"
+              params={{ categoryId: categoryId || '' }}
+              className="text-xs font-semibold text-slate-500 hover:text-[#0B132B] truncate max-w-[200px]"
+            >
+              Category Detail
+            </Link>
+            <span className="text-slate-300">/</span>
             <span className="text-xs font-bold uppercase tracking-wider font-mono text-[#ED248F] px-3 py-1 rounded-full bg-[#ED248F]/10">
               {condition.anatomicalRegion}
             </span>

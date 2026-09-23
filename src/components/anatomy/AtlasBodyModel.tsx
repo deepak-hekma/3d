@@ -182,7 +182,7 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
   }, [materials]);
 
   const highlighted = useMemo(() => {
-    if (hoveredSystem) return new Set<SystemId>([hoveredSystem]);
+    if (hoveredSystem) return new Set<SystemId>([hoveredSystem as SystemId]);
     const fromCard = systemsForRegion(hoveredCardRegion);
     if (fromCard.size) return fromCard;
     const category = CATEGORIES_DATA.find((entry) => entry.id === selectedCategoryId);

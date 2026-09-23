@@ -140,15 +140,6 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
         </div>
       )}
 
-      {status === 'ready' && !contextLost && (
-        <a
-          href="/ATTRIBUTION.md"
-          className="absolute bottom-4 left-4 z-20 text-[10px] font-medium text-slate-500 hover:text-slate-700 bg-white/70 backdrop-blur-sm px-2 py-1 rounded-lg pointer-events-auto"
-        >
-          Anatomy: BodyParts3D · CC BY 4.0
-        </a>
-      )}
-
       <RegionHighlight />
     </div>
   );

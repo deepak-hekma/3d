@@ -148,7 +148,7 @@ export const ConditionsIndexRoute: React.FC = () => {
       {/* CASCADING CONDITIONS MENU (Triggered by Click on Card or 3D Organ) */}
       <AnimatePresence>
         {activeCascadingCategory && (
-          <div className="fixed top-20 right-4 sm:right-6 lg:left-[51%] xl:left-[52%] lg:right-auto z-40 max-w-2xl w-[calc(100vw-2rem)] sm:w-auto">
+          <div className="fixed top-20 right-4 sm:right-6 lg:right-8 xl:right-12 z-40 max-w-[calc(100vw-2rem)] pointer-events-none">
             <CascadingConditionsMenu
               category={activeCascadingCategory}
               onClose={closeCascadingMenu}

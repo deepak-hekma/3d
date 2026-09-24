@@ -16,7 +16,7 @@ interface AtlasBodyModelProps {
   onRegionClick?: (categoryId: string) => void;
 }
 
-// Rich medical palette with physically accurate roughness & clearcoat gloss matching human-atlas
+// Calibrated medical palette with balanced, natural contrast & soft clearcoat gloss
 const NATURAL_PALETTE: Record<
   string,
   {
@@ -31,104 +31,104 @@ const NATURAL_PALETTE: Record<
   }
 > = {
   skeletal: {
-    color: '#E8E2D5',
-    opacity: 0.32, // Translucent pearl bone in default view so internal organs (brain, lungs, heart) are clearly visible
-    emissive: '#1F1B16',
+    color: '#D2CABC', // Soft pearl bone ivory with gentle definition
+    opacity: 0.37, // Balanced bone visibility without overpowering internal organs
+    emissive: '#262018',
     emissiveIntensity: 0.02,
-    roughness: 0.45,
-    clearcoat: 0.25,
-    clearcoatRoughness: 0.2,
-    metalness: 0.04,
+    roughness: 0.40,
+    clearcoat: 0.30,
+    clearcoatRoughness: 0.20,
+    metalness: 0.03,
   },
   muscular: {
-    color: '#A85B50',
-    opacity: 0.08, // Soft ghost muscle fibers so they do not block internal organs
-    emissive: '#200D0B',
+    color: '#9A4B42', // Soft anatomical muscle tone
+    opacity: 0.13, // Gentle silhouette contour for limbs and torso without heavy darkness
+    emissive: '#38130F',
     emissiveIntensity: 0.02,
-    roughness: 0.4,
-    clearcoat: 0.15,
-    clearcoatRoughness: 0.3,
-    metalness: 0.04,
+    roughness: 0.38,
+    clearcoat: 0.25,
+    clearcoatRoughness: 0.25,
+    metalness: 0.02,
   },
   cardiac: {
-    color: '#B96760', // Vibrant heart
+    color: '#C0323C', // Balanced arterial crimson
     opacity: 1.0,
     emissive: '#450A0A',
-    emissiveIntensity: 0.08,
+    emissiveIntensity: 0.09,
     roughness: 0.22,
-    clearcoat: 0.85,
-    clearcoatRoughness: 0.1,
-    metalness: 0.08,
+    clearcoat: 0.88,
+    clearcoatRoughness: 0.09,
+    metalness: 0.06,
   },
   sensory: {
-    color: '#06B6D4', // Eyes & sensory
-    opacity: 1.0,
-    emissive: '#164E63',
-    emissiveIntensity: 0.05,
-    roughness: 0.2,
-    clearcoat: 0.9,
-    clearcoatRoughness: 0.08,
-    metalness: 0.1,
+    color: '#CEC4B5', // Natural anatomical tissue / cartilage tone for ears, eyes & wrist retinaculum
+    opacity: 0.90,
+    emissive: '#262018',
+    emissiveIntensity: 0.02,
+    roughness: 0.36,
+    clearcoat: 0.30,
+    clearcoatRoughness: 0.20,
+    metalness: 0.03,
   },
   nervous: {
-    color: '#D8B565', // Rich amber gold for Brain & Nerves
+    color: '#D68819', // Warm neural amber
     opacity: 1.0,
-    emissive: '#78350F',
+    emissive: '#451A03',
     emissiveIntensity: 0.08,
-    roughness: 0.26,
-    clearcoat: 0.7,
-    clearcoatRoughness: 0.12,
-    metalness: 0.06,
-  },
-  respiratory: {
-    color: '#DB7093', // Distinct soft rose for Lungs & Airways
-    opacity: 1.0,
-    emissive: '#500724',
-    emissiveIntensity: 0.06,
-    roughness: 0.3,
-    clearcoat: 0.65,
-    clearcoatRoughness: 0.12,
+    roughness: 0.24,
+    clearcoat: 0.78,
+    clearcoatRoughness: 0.11,
     metalness: 0.05,
   },
+  respiratory: {
+    color: '#CA5879', // Soft pulmonary rose/coral for lungs
+    opacity: 0.94,
+    emissive: '#4C051B',
+    emissiveIntensity: 0.07,
+    roughness: 0.27,
+    clearcoat: 0.72,
+    clearcoatRoughness: 0.11,
+    metalness: 0.04,
+  },
   endocrine: {
-    color: '#C5A09A', // Pancreas / glands
+    color: '#A855F7', // Soft orchid/purple for glands & pancreas
     opacity: 1.0,
     emissive: '#3B0764',
-    emissiveIntensity: 0.05,
-    roughness: 0.28,
-    clearcoat: 0.7,
-    clearcoatRoughness: 0.12,
-    metalness: 0.06,
+    emissiveIntensity: 0.07,
+    roughness: 0.25,
+    clearcoat: 0.76,
+    clearcoatRoughness: 0.11,
+    metalness: 0.05,
   },
   digestive: {
-    color: '#C4683C', // Warm terracotta for stomach, liver, intestines
+    color: '#BC5C1D', // Warm anatomical terracotta with natural shading
+    opacity: 1.0,
+    emissive: '#381404',
+    emissiveIntensity: 0.06,
+    roughness: 0.24,
+    clearcoat: 0.82,
+    clearcoatRoughness: 0.11,
+    metalness: 0.05,
+  },
+  urinary: {
+    color: '#D97706', // Warm amber-orange for kidneys & bladder
     opacity: 1.0,
     emissive: '#431407',
     emissiveIntensity: 0.06,
     roughness: 0.25,
-    clearcoat: 0.8,
-    clearcoatRoughness: 0.12,
-    metalness: 0.06,
-  },
-  urinary: {
-    color: '#D97706', // Amber gold for kidneys & bladder
-    opacity: 1.0,
-    emissive: '#451A03',
-    emissiveIntensity: 0.05,
-    roughness: 0.25,
-    clearcoat: 0.75,
-    clearcoatRoughness: 0.12,
-    metalness: 0.06,
+    clearcoat: 0.76,
+    clearcoatRoughness: 0.11,
+    metalness: 0.05,
   },
   lymphatic: {
-    color: '#879F7C', // Soft sage green for lymph nodes
+    color: '#16A34A', // Soft clinical emerald for lymph nodes
     opacity: 1.0,
-    emissive: '#064E3B',
-    emissiveIntensity: 0.05,
-    roughness: 0.3,
-    clearcoat: 0.6,
-    clearcoatRoughness: 0.15,
-    metalness: 0.06,
+    emissive: '#052E16',
+    emissiveIntensity: 0.06,
+    roughness: 0.28,
+    clearcoat: 0.68,
+    clearcoatRoughness: 0.13,
+    metalness: 0.05,
   },
 };
 
@@ -198,28 +198,30 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
       const isOn = highlighted.has(system);
       if (hasHighlight) {
         if (isOn) {
-          // TARGET ORGAN / SYSTEM
+          // TARGET ORGAN / SYSTEM: Vivid highlight with natural warm glow (no blue tint)
           material.color.set(natural.color);
           material.opacity = 1.0;
           material.transparent = false;
           material.depthWrite = true;
-          material.roughness = Math.max(0.18, natural.roughness - 0.08);
-          material.clearcoat = 0.85;
+          material.roughness = Math.max(0.15, natural.roughness - 0.06);
+          material.clearcoat = 0.90;
 
-          // Subtle organic rim glow rather than flat cyan wash
           if (system === 'skeletal') {
-            material.emissive.set('#5EEAD4');
-            material.emissiveIntensity = 0.15;
+            material.emissive.set('#3D3425');
+            material.emissiveIntensity = 0.14;
+          } else if (system === 'muscular') {
+            material.emissive.set('#4A1510');
+            material.emissiveIntensity = 0.14;
           } else {
-            material.emissive.set('#38BDF8');
-            material.emissiveIntensity = 0.08;
+            material.emissive.set(natural.emissive);
+            material.emissiveIntensity = Math.min(0.20, natural.emissiveIntensity * 2.2);
           }
         } else if (isInternalOrganTargeted && (system === 'skeletal' || system === 'muscular')) {
-          // SMART AUTO-PEELING: Automatically ghost anterior bones & muscles
+          // SMART AUTO-PEELING: Ghost anterior bones & muscles while keeping contour
           material.color.set(natural.color);
           material.emissive.set(natural.emissive);
-          material.emissiveIntensity = 0.0;
-          material.opacity = system === 'muscular' ? 0.02 : 0.04;
+          material.emissiveIntensity = 0.01;
+          material.opacity = system === 'muscular' ? 0.04 : 0.08;
           material.transparent = true;
           material.depthWrite = false;
         } else {
@@ -227,7 +229,7 @@ export const AtlasBodyModel: React.FC<AtlasBodyModelProps> = ({ meshes, onRegion
           material.color.set(natural.color);
           material.emissive.set(natural.emissive);
           material.emissiveIntensity = 0.01;
-          material.opacity = system === 'muscular' ? 0.05 : 0.20;
+          material.opacity = system === 'muscular' ? 0.06 : 0.22;
           material.transparent = true;
           material.depthWrite = false;
         }

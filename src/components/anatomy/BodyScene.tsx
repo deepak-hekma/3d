@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment } from '@react-three/drei';
+import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import { AtlasBodyModel } from './AtlasBodyModel';
 import { CameraController } from './CameraController';
 import { AtlasSkeleton } from './AtlasSkeleton';
@@ -36,6 +36,10 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
   return (
     <div
       className="relative h-full w-full pointer-events-auto overflow-hidden bg-[#FAFBFC]"
+      style={{
+        background:
+          'radial-gradient(ellipse 70% 80% at 52% 48%, rgba(238, 236, 232, 0.35) 0%, rgba(245, 243, 240, 0.18) 55%, rgba(250, 251, 252, 1) 100%)',
+      }}
       data-atlas-status={status}
       data-atlas-meshes={meshes.length}
       onPointerLeave={clearModelHover}
@@ -51,7 +55,7 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
             powerPreference: 'high-performance',
             failIfMajorPerformanceCaveat: false,
             toneMapping: THREE.ACESFilmicToneMapping,
-            toneMappingExposure: 1.05,
+            toneMappingExposure: 1.0,
           }}
           style={{ width: '100%', height: '100%' }}
           onCreated={({ gl }) => {
@@ -66,29 +70,42 @@ export const BodyScene: React.FC<BodySceneProps> = ({ onRegionClick }) => {
             );
           }}
         >
-          {/* Studio IBL Environment for realistic specular reflections on physical materials */}
-          <Environment preset="studio" />
+          {/* Studio IBL Environment for soft realistic specular gloss */}
+          <Environment preset="studio" environmentIntensity={0.45} />
 
-          {/* Balanced lighting with clear shadows & depth */}
-          <ambientLight intensity={0.35} />
+          {/* Balanced ambient light for natural shadow transitions */}
+          <ambientLight intensity={0.28} />
           
-          {/* Key Light (Front-Right) */}
+          {/* Key Light (Front-Right) - smooth form definition without harsh highlights */}
           <directionalLight
-            position={[5, 10, 7]}
-            intensity={1.4}
+            position={[4.5, 9, 6]}
+            intensity={1.15}
             color="#FFFFFF"
             castShadow
             shadow-mapSize={[1024, 1024]}
           />
           
-          {/* Fill Light (Soft Cool Medical Fill from Front-Left) */}
-          <directionalLight position={[-6, 4, -4]} intensity={0.5} color="#E0F2FE" />
+          {/* Fill Light (Soft neutral fill from Front-Left, zero blue tint) */}
+          <directionalLight position={[-5, 3.5, 3]} intensity={0.35} color="#FFFFFF" />
           
-          {/* Rim / Silhouette Back Light (Enhances organ edge separation) */}
-          <directionalLight position={[0, 6, -6]} intensity={0.8} color="#F8FAFC" />
+          {/* Rim / Silhouette Back Light - crisp neutral white edge separation */}
+          <directionalLight position={[0, 5, -5]} intensity={0.85} color="#FFFFFF" />
+
+          {/* Secondary lower rim light for subtle leg & arm contour */}
+          <directionalLight position={[0, -2, -4]} intensity={0.35} color="#F5F3EF" />
           
-          {/* Subtle Pink Medical Accent Light */}
-          <pointLight position={[0, 2, 2.5]} intensity={0.3} color="#ED248F" />
+          {/* Subtle medical accent light */}
+          <pointLight position={[0, 1.2, 2.2]} intensity={0.16} color="#ED248F" />
+
+          {/* Contact Shadows grounding the body model on the floor */}
+          <ContactShadows
+            position={[0, 0.02, 0]}
+            opacity={0.32}
+            scale={2.6}
+            blur={2.6}
+            far={1.6}
+            color="#0F172A"
+          />
 
           <AtlasBodyModel meshes={meshes} onRegionClick={onRegionClick} />
           <CameraController />
